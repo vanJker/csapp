@@ -132,6 +132,18 @@ uint32_t int2float(int32_t i)
     return 0x7f800000;
 }
 
+uint64_t uint2double(uint64_t u)
+{
+    // TODO
+    return 0;
+}
+
+uint64_t int2double(int64_t i)
+{
+    // TODO
+    return 0;
+}
+
 int main()
 {
     uint32_t uf;
