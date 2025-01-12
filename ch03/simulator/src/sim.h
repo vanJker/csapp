@@ -5,9 +5,12 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 #define MEM_CAPACITY 1024
 #define PROGRAM_CAPACITY 128
+
+#define array_siaze(a) (sizeof(a) / sizeof(a[0]))
 
 /* CPU */
 typedef struct {
@@ -40,14 +43,20 @@ void cpu_dump(Cpu *cpu);
 /* Memory */
 typedef enum {
     NOP = 0,
-    MOV,
-    PUSH,
+    PUSH_REG,
+    POP_REG,
+    MOV_REG2REG,
+    MOV_REG2MEM,
+    MOV_MEM2REG,
+    ADD_REG2REG,
     CALL,
-    ADD_REG_REG,
+    RET,
+
     INST_CNT,
 } Inst_Type;
 
 typedef enum {
+    EMPTY = 0,
     IMM,
     REG,
     MEM_IMM,
@@ -78,18 +87,34 @@ typedef struct {
     Operand dst;
 } Inst;
 
-typedef void (*Handler)(uint64_t, uint64_t);
-
 typedef struct {
-    uint8_t data[MEM_CAPACITY];
+    uint8_t ram[MEM_CAPACITY];
+    uint8_t *stack;
 } Memory;
 
+/* Disk */
+typedef struct {
+    Inst program[PROGRAM_CAPACITY];
+    size_t program_size;
+} Disk;
+
 /* Machine */
+typedef struct Machine Machine;
+typedef void (*Handler)(Machine *, uint64_t, uint64_t);
+
+struct Machine {
+    Cpu *cpu;
+    Memory *memory;
+    Disk *disk;
+};
+
+extern Machine machine;
 extern Cpu cpu;
-extern Memory mem;
-extern Inst program[PROGRAM_CAPACITY];
+extern Memory memory;
+extern Disk disk;
 extern Handler handler_table[INST_CNT];
 
-void instruction_cycle(Cpu *cpu);
+void instruction_cycle(Machine *m);
+void load_program_from_disk(Machine *m);
 
 #endif

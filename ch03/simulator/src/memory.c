@@ -1,21 +1,55 @@
 #include "sim.h"
 
-Memory mem = {0};
+Memory memory = {0};
 
-static void add_reg_reg(uint64_t src, uint64_t dst)
+static void push_reg(Machine *m, uint64_t src, uint64_t dst)
 {
+    // TODO
+}
+
+static void pop_reg(Machine *m, uint64_t src, uint64_t dst)
+{
+    // TODO
+}
+
+static void call(Machine *m, uint64_t src, uint64_t dst)
+{
+    (void) m;
+    cpu.regs.rip = src;
+}
+
+static void ret(void)
+{
+    // TODO
+}
+
+static void mov_src2dst(Machine *m, uint64_t src, uint64_t dst)
+{
+    (void) m;
+    *(uint64_t *) dst = *(uint64_t *) src;
+}
+
+static void add_src2dst(Machine *m, uint64_t src, uint64_t dst)
+{
+    (void) m;
     *(uint64_t *) dst = *(uint64_t *) src + *(uint64_t *) dst;
 }
 
 Handler handler_table[INST_CNT] = {
-    [ADD_REG_REG] = &add_reg_reg,
+    [MOV_REG2REG] = &mov_src2dst,
+    [MOV_REG2MEM] = &mov_src2dst,
+    [MOV_MEM2REG] = &mov_src2dst,
+    [ADD_REG2REG] = &add_src2dst,
+    [CALL] = &call,
 };
 
 uint64_t decode_operand(Operand operand)
 {
     switch (operand.type) {
+    case EMPTY:
+        return 0;
     case IMM:
-        return operand.imm;
+        return *(uint64_t *) &operand.imm;
     case REG:
         return (uint64_t) operand.reg1;
     case MEM_IMM:

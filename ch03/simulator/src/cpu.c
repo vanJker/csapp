@@ -14,4 +14,10 @@ void cpu_dump(Cpu *cpu)
     printf("ah  =\t0x%02x\n", regs->ah);
 
     printf("rbx =\t0x%016lx\n", regs->rbx);
+    printf("rcx =\t0x%016lx\n", regs->rcx);
+    printf("rdx =\t0x%016lx\n", regs->rdx);
+    printf("rsi =\t0x%016lx\n", regs->rsi);
+    printf("rdi =\t0x%016lx\n", regs->rdi);
+    printf("rbp =\t0x%016lx\n", regs->rbp);
+    printf("rsp =\t0x%016lx\n", regs->rsp);
 }
