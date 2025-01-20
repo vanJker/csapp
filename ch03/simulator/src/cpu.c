@@ -20,4 +20,6 @@ void cpu_dump(Cpu *cpu)
     printf("rdi =\t0x%016lx\n", regs->rdi);
     printf("rbp =\t0x%016lx\n", regs->rbp);
     printf("rsp =\t0x%016lx\n", regs->rsp);
+
+    printf("rip =\t0x%016lx\n", regs->rip);
 }

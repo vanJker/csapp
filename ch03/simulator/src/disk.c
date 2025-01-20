@@ -5,16 +5,16 @@ Disk disk = {
         {
             // <add>:
             {
-                // push   %rbp
-                PUSH_REG,
-                {REG, 0, &cpu.regs.rbp, NULL, 0},
-                {EMPTY, 0, NULL, NULL, 0},
+                .type = PUSH_REG,
+                .src = {REG, 0, &cpu.regs.rbp, NULL, 0},
+                .dst = {EMPTY, 0, NULL, NULL, 0},
+                .code = "push   %rbp",
             },
             {
-                // mov    %rsp,%rbp
-                MOV_REG2REG,
-                {REG, 0, &cpu.regs.rsp, NULL, 0},
-                {REG, 0, &cpu.regs.rbp, NULL, 0},
+                .type = MOV_REG2REG,
+                .src = {REG, 0, &cpu.regs.rsp, NULL, 0},
+                .dst = {REG, 0, &cpu.regs.rbp, NULL, 0},
+                .code = "mov    %rsp,%rbp",
             },
             {
                 // mov    %rdi,-0x18(%rbp)
@@ -72,22 +72,22 @@ Disk disk = {
             },
             // <main>:
             {
-                // mov    %rdx,%rsi
-                MOV_REG2REG,
-                {REG, 0, &cpu.regs.rdx, NULL, 0},
-                {REG, 0, &cpu.regs.rsi, NULL, 0},
+                .type = MOV_REG2REG,
+                .src = {REG, 0, &cpu.regs.rdx, NULL, 0},
+                .dst = {REG, 0, &cpu.regs.rsi, NULL, 0},
+                .code = "mov    %rdx,%rsi",
             },
             {
-                // mov    %rax,%rdi
-                MOV_REG2REG,
-                {REG, 0, &cpu.regs.rax, NULL, 0},
-                {REG, 0, &cpu.regs.rdi, NULL, 0},
+                .type = MOV_REG2REG,
+                .src = {REG, 0, &cpu.regs.rax, NULL, 0},
+                .dst = {REG, 0, &cpu.regs.rdi, NULL, 0},
+                .code = "mov    %rax,%rdi",
             },
             {
-                // call   1129 <add>
-                CALL,
-                {EMPTY, (uint64_t) disk.program, NULL, NULL, 0},
-                {EMPTY, 0, NULL, NULL, 0},
+                .type = CALL,
+                .src = {IMM, (uint64_t) disk.program, NULL, NULL, 0},
+                .dst = {EMPTY, 0, NULL, NULL, 0},
+                .code = "call   1129 <add>",
             },
             {
                 // mov    %rax,-0x8(%rbp)

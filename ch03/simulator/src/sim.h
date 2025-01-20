@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MEM_CAPACITY 1024
+#define MEM_CAPACITY (1024 * 8)
 #define PROGRAM_CAPACITY 128
 
 #define array_siaze(a) (sizeof(a) / sizeof(a[0]))
@@ -85,12 +85,16 @@ typedef struct {
     Inst_Type type;
     Operand src;
     Operand dst;
+    const char *code;
 } Inst;
 
 typedef struct {
     uint8_t ram[MEM_CAPACITY];
     uint8_t *stack;
 } Memory;
+
+uint64_t read64bits(Memory *memory, uint64_t paddr);
+void write64bits(Memory *memory, uint64_t paddr, uint64_t data);
 
 /* Disk */
 typedef struct {
@@ -116,5 +120,6 @@ extern Handler handler_table[INST_CNT];
 
 void instruction_cycle(Machine *m);
 void load_program_from_disk(Machine *m);
+void stack_dump(Machine *m);
 
 #endif

@@ -14,8 +14,14 @@ static void pop_reg(Machine *m, uint64_t src, uint64_t dst)
 
 static void call(Machine *m, uint64_t src, uint64_t dst)
 {
-    (void) m;
-    cpu.regs.rip = src;
+    (void) dst;
+
+    // push return address
+    m->cpu->regs.rsp -= sizeof(uint64_t);
+    *(uint64_t *) m->cpu->regs.rsp = m->cpu->regs.rip + sizeof(Inst);
+
+    // jump to callee
+    m->cpu->regs.rip = src;
 }
 
 static void ret(void)
@@ -25,14 +31,14 @@ static void ret(void)
 
 static void mov_src2dst(Machine *m, uint64_t src, uint64_t dst)
 {
-    (void) m;
     *(uint64_t *) dst = *(uint64_t *) src;
+    m->cpu->regs.rip += sizeof(Inst);
 }
 
 static void add_src2dst(Machine *m, uint64_t src, uint64_t dst)
 {
-    (void) m;
     *(uint64_t *) dst = *(uint64_t *) src + *(uint64_t *) dst;
+    m->cpu->regs.rip += sizeof(Inst);
 }
 
 Handler handler_table[INST_CNT] = {
@@ -73,4 +79,24 @@ uint64_t decode_operand(Operand operand)
     default:
         assert(0 && "Unsupport operand type");
     }
+}
+
+#define CACHE_SET 0
+
+uint64_t read64bits(Memory *memory, uint64_t paddr)
+{
+#if CACHE_SET
+    return 0;
+#endif
+
+    return *(uint64_t *) (&memory->ram[paddr]);
+}
+
+void write64bits(Memory *memory, uint64_t paddr, uint64_t data)
+{
+#if CACHE_SET
+    return;
+#endif
+
+    *(uint64_t *) (&memory->ram[paddr]) = data;
 }

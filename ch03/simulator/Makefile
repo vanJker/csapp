@@ -12,9 +12,7 @@ sim: $(OBJS)
 	$(CC) $(CFLAGS) $^ -o $@ $(LIBS)
 
 $(BUILD)/%.o: $(SRC)/%.c
-	@if [ ! -d "$(BUILD)" ]; then \
-	    mkdir $(BUILD);           \
-	fi
+	@if [ ! -d "$(dir $@)" ]; then mkdir -p $(BUILD); fi
 	$(CC) $(CFLAGS) -c $< -o $@ $(LIBS)
 
 clean:
