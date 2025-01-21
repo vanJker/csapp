@@ -10,37 +10,9 @@
 #define MEM_CAPACITY (1024 * 8)
 #define PROGRAM_CAPACITY 128
 
-#define array_siaze(a) (sizeof(a) / sizeof(a[0]))
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 
-/* CPU */
-typedef struct {
-    union {
-        struct {
-            uint8_t al;
-            uint8_t ah;
-        };
-        uint16_t ax;
-        uint32_t eax;
-        uint64_t rax;
-    };
-    uint64_t rbx;
-    uint64_t rcx;
-    uint64_t rdx;
-    uint64_t rsi;
-    uint64_t rdi;
-    uint64_t rbp;
-    uint64_t rsp;
-
-    uint64_t rip;
-} Reg;
-
-typedef struct {
-    Reg regs;
-} Cpu;
-
-void cpu_dump(Cpu *cpu);
-
-/* Memory */
+/* ISA */
 typedef enum {
     NOP = 0,
     PUSH_REG,
@@ -89,18 +61,52 @@ typedef struct {
     const char *code;
 } Inst;
 
+/* CPU */
+typedef struct {
+    union {
+        struct {
+            uint8_t al;
+            uint8_t ah;
+        };
+        uint16_t ax;
+        uint32_t eax;
+        uint64_t rax;
+    };
+    uint64_t rbx;
+    uint64_t rcx;
+    uint64_t rdx;
+    uint64_t rsi;
+    uint64_t rdi;
+    uint64_t rbp;
+    uint64_t rsp;
+
+    uint64_t rip;
+} Reg;
+
+typedef struct {
+    Reg regs;
+} Cpu;
+
+void reset_cpu(Cpu *cpu);
+void cpu_dump(Cpu *cpu);
+
+/* Memory */
 typedef struct {
     uint8_t ram[MEM_CAPACITY];
 } Memory;
 
 uint64_t read64bits(Memory *memory, uint64_t paddr);
 void write64bits(Memory *memory, uint64_t paddr, uint64_t data);
+void reset_memory(Memory *memory);
 
 /* Disk */
 typedef struct {
     Inst program[PROGRAM_CAPACITY];
     size_t program_size;
 } Disk;
+
+void reset_disk(Disk *disk);
+void write_program_to_disk(Disk *disk, Inst *program, size_t program_size);
 
 /* Machine */
 typedef struct Machine Machine;
@@ -118,6 +124,7 @@ extern Memory memory;
 extern Disk disk;
 extern Handler handler_table[INST_CNT];
 
+void reset_machine(Machine *m);
 void instruction_cycle(Machine *m);
 void load_program_from_disk(Machine *m);
 void stack_dump(Machine *m);

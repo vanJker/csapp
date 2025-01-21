@@ -1,5 +1,5 @@
 
-dasm.out:     file format elf64-x86-64
+sum.out:     file format elf64-x86-64
 
 
 Disassembly of section .init:
@@ -41,7 +41,7 @@ Disassembly of section .text:
     1052:	54                   	push   %rsp
     1053:	45 31 c0             	xor    %r8d,%r8d
     1056:	31 c9                	xor    %ecx,%ecx
-    1058:	48 8d 3d ef 00 00 00 	lea    0xef(%rip),%rdi        # 114e <main>
+    1058:	48 8d 3d 01 01 00 00 	lea    0x101(%rip),%rdi        # 1160 <main>
     105f:	ff 15 73 2f 00 00    	call   *0x2f73(%rip)        # 3fd8 <__libc_start_main@GLIBC_2.34>
     1065:	f4                   	hlt
     1066:	66 2e 0f 1f 84 00 00 	cs nopw 0x0(%rax,%rax,1)
@@ -101,38 +101,39 @@ Disassembly of section .text:
     1120:	f3 0f 1e fa          	endbr64
     1124:	e9 77 ff ff ff       	jmp    10a0 <register_tm_clones>
 
-0000000000001129 <add>:
+0000000000001129 <sum>:
     1129:	f3 0f 1e fa          	endbr64
     112d:	55                   	push   %rbp
     112e:	48 89 e5             	mov    %rsp,%rbp
-    1131:	48 89 7d e8          	mov    %rdi,-0x18(%rbp)
-    1135:	48 89 75 e0          	mov    %rsi,-0x20(%rbp)
-    1139:	48 8b 55 e8          	mov    -0x18(%rbp),%rdx
-    113d:	48 8b 45 e0          	mov    -0x20(%rbp),%rax
-    1141:	48 01 d0             	add    %rdx,%rax
-    1144:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
-    1148:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
-    114c:	5d                   	pop    %rbp
-    114d:	c3                   	ret
+    1131:	48 83 ec 10          	sub    $0x10,%rsp
+    1135:	48 89 7d f8          	mov    %rdi,-0x8(%rbp)
+    1139:	48 83 7d f8 00       	cmpq   $0x0,-0x8(%rbp)
+    113e:	75 07                	jne    1147 <sum+0x1e>
+    1140:	b8 00 00 00 00       	mov    $0x0,%eax
+    1145:	eb 17                	jmp    115e <sum+0x35>
+    1147:	48 8b 45 f8          	mov    -0x8(%rbp),%rax
+    114b:	48 83 e8 01          	sub    $0x1,%rax
+    114f:	48 89 c7             	mov    %rax,%rdi
+    1152:	e8 d2 ff ff ff       	call   1129 <sum>
+    1157:	48 8b 55 f8          	mov    -0x8(%rbp),%rdx
+    115b:	48 01 d0             	add    %rdx,%rax
+    115e:	c9                   	leave
+    115f:	c3                   	ret
 
-000000000000114e <main>:
-    114e:	f3 0f 1e fa          	endbr64
-    1152:	55                   	push   %rbp
-    1153:	48 89 e5             	mov    %rsp,%rbp
-    1156:	48 83 ec 20          	sub    $0x20,%rsp
-    115a:	48 c7 45 e8 34 12 00 	movq   $0x1234,-0x18(%rbp)
-    1161:	00 
-    1162:	b8 00 00 cd ab       	mov    $0xabcd0000,%eax
-    1167:	48 89 45 f0          	mov    %rax,-0x10(%rbp)
-    116b:	48 8b 55 f0          	mov    -0x10(%rbp),%rdx
-    116f:	48 8b 45 e8          	mov    -0x18(%rbp),%rax
-    1173:	48 89 d6             	mov    %rdx,%rsi
-    1176:	48 89 c7             	mov    %rax,%rdi
-    1179:	e8 ab ff ff ff       	call   1129 <add>
-    117e:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
-    1182:	b8 00 00 00 00       	mov    $0x0,%eax
-    1187:	c9                   	leave
-    1188:	c3                   	ret
+0000000000001160 <main>:
+    1160:	f3 0f 1e fa          	endbr64
+    1164:	55                   	push   %rbp
+    1165:	48 89 e5             	mov    %rsp,%rbp
+    1168:	48 83 ec 10          	sub    $0x10,%rsp
+    116c:	48 c7 45 f0 0a 00 00 	movq   $0xa,-0x10(%rbp)
+    1173:	00 
+    1174:	48 8b 45 f0          	mov    -0x10(%rbp),%rax
+    1178:	48 89 c7             	mov    %rax,%rdi
+    117b:	e8 a9 ff ff ff       	call   1129 <sum>
+    1180:	48 89 45 f8          	mov    %rax,-0x8(%rbp)
+    1184:	b8 00 00 00 00       	mov    $0x0,%eax
+    1189:	c9                   	leave
+    118a:	c3                   	ret
 
 Disassembly of section .fini:
 

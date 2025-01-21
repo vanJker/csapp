@@ -2,6 +2,12 @@
 
 Cpu cpu = {0};
 
+void reset_cpu(Cpu *cpu)
+{
+    assert(cpu != NULL);
+    memset(cpu, 0, sizeof(Cpu));
+}
+
 void cpu_dump(Cpu *cpu)
 {
     printf("Registers:\n");

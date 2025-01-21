@@ -1,56 +1,20 @@
 #include "sim.h"
 
+#define DEBUG 0
+
 static void test(void);
-
-Machine machine = {
-    .cpu = &cpu,
-    .memory = &memory,
-    .disk = &disk,
-};
-
-void instruction_cycle(Machine *m)
-{
-    size_t n = m->disk->program_size;
-    for (size_t i = 0; i < n; i++) {
-        Inst *inst = (Inst *) m->cpu->regs.rip;
-
-        uint64_t src = decode_operand(inst->src);
-        uint64_t dst = decode_operand(inst->dst);
-        handler_table[inst->type](m, src, dst);
-
-        // printf("\n");
-        printf("    %p    %s\n", (void *) inst, inst->code);
-        // cpu_dump(m->cpu);
-        // stack_dump(m);
-    }
-}
-
-void load_program_from_disk(Machine *m)
-{
-    memcpy(&m->memory->ram, &m->disk->program,
-           m->disk->program_size * sizeof(m->disk->program[0]));
-}
-
-void stack_dump(Machine *m)
-{
-    printf("Stack:\n");
-
-    size_t n = 8;
-    uint64_t *sp = (uint64_t *) m->cpu->regs.rsp;
-    uint64_t *addr = ((uint64_t *) m->cpu->regs.rsp) + n;
-    for (size_t i = 0; i < 2 * n; i++) {
-        printf("%p: %016lx", (void *) addr, *addr);
-        if (addr == sp) {
-            printf(" <== rsp");
-        }
-        printf("\n");
-
-        addr--;
-    }
-}
 
 int main(void)
 {
+    test();
+
+    return 0;
+}
+
+static void test_add(void)
+{
+    reset_machine(&machine);
+
     cpu = (Cpu){
         .regs =
             {
@@ -62,23 +26,22 @@ int main(void)
             },
     };
 
-    // printf("%lx\n", sizeof(Inst));
+#if DEBUG
     cpu_dump(&cpu);
     stack_dump(&machine);
+#endif
 
+    extern Inst add_program[];
+    extern size_t add_program_size;
+    write_program_to_disk(machine.disk, add_program, add_program_size);
     load_program_from_disk(&machine);
     instruction_cycle(&machine);
 
+#if DEBUG
     cpu_dump(&cpu);
     stack_dump(&machine);
+#endif
 
-    test();
-
-    return 0;
-}
-
-static void test(void)
-{
     assert(cpu.regs.rax == 0x0);
     assert(cpu.regs.rbx == 0x0);
     assert(cpu.regs.rcx == 0x0);
@@ -98,4 +61,43 @@ static void test(void)
     assert(read64bits(&memory, cpu.regs.rsp - 48) == 0xabcd0000);
 
     printf("===TEST PASS===\n");
+}
+
+static void test_sum(void)
+{
+    reset_machine(&machine);
+
+    cpu = (Cpu){
+        .regs =
+            {
+                .rax = 0xa,
+                .rbp = (uint64_t) (memory.ram + MEM_CAPACITY),
+                .rsp = (uint64_t) (memory.ram + MEM_CAPACITY),
+                .rip = (uint64_t) (((Inst *) &memory.ram) + 0),
+            },
+    };
+
+#if DEBUG
+    cpu_dump(&cpu);
+    stack_dump(&machine);
+#endif
+
+    extern Inst sum_program[];
+    extern size_t sum_program_size;
+    write_program_to_disk(machine.disk, sum_program, sum_program_size);
+    load_program_from_disk(&machine);
+    instruction_cycle(&machine);
+
+#if DEBUG
+    cpu_dump(&cpu);
+    stack_dump(&machine);
+#endif
+
+    printf("===TEST PASS===\n");
+}
+
+static void test(void)
+{
+    test_add();
+    test_sum();
 }
