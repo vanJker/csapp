@@ -1,4 +1,4 @@
-CFLAGS=-Wall -Wextra -std=c11 -pedantic
+CFLAGS=-Wall -Wextra -std=c11 -pedantic -g
 LIBS=
 
 TARGETS := $(patsubst ./%.c, ./%.txt, $(wildcard ./*.c))

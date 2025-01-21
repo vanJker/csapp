@@ -44,6 +44,7 @@ void cpu_dump(Cpu *cpu);
 typedef enum {
     NOP = 0,
     PUSH_REG,
+    MOV_IMM2REG,
     POP_REG,
     MOV_REG2REG,
     MOV_REG2MEM,
@@ -90,7 +91,6 @@ typedef struct {
 
 typedef struct {
     uint8_t ram[MEM_CAPACITY];
-    uint8_t *stack;
 } Memory;
 
 uint64_t read64bits(Memory *memory, uint64_t paddr);
